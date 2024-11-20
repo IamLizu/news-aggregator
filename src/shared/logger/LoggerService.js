@@ -83,7 +83,7 @@ class LoggerService {
          * Getting the caller introduces a performance overhead
          * because of stack trace generation on each log call.
          *
-         * This is useful for debugging purposes but should be
+         * This is useful for debugging purposes but should not be
          * called in production environments.
          */
         if (process.env.NODE_ENV === "development") {
