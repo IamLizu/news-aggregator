@@ -13,6 +13,11 @@ class ArticleRoutes {
             "/",
             this.articlesController.getAll.bind(this.articlesController),
         );
+
+        this.router.get(
+            "/fetch",
+            this.articlesController.fetchAndSave.bind(this.articlesController),
+        );
     }
 
     getRoutes() {

@@ -9,6 +9,11 @@ class ArticlesRepository {
         ];
     }
 
+    async saveArticles(articles) {
+        this.articles.push(...articles);
+        this.logger.info(`Saved ${articles.length} articles`);
+    }
+
     async getAllArticles() {
         return this.articles;
     }

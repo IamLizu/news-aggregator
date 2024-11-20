@@ -1,16 +1,31 @@
-const { createContainer, asValue, Lifetime, InjectionMode } = require("awilix");
+const {
+    createContainer,
+    asValue,
+    Lifetime,
+    InjectionMode,
+    asFunction,
+} = require("awilix");
 const LoggerService = require("./shared/logger/LoggerService");
+const RSSParser = require("rss-parser");
 
 const container = createContainer();
 
 container.register({
     logger: asValue(LoggerService),
+    parser: asValue(new RSSParser()),
 });
 
 container.loadModules(
     [
         "src/modules/**/application/**/*.js",
-        "src/modules/**/domain/**/*.js",
+        /**
+         * We cannot register domain objects implicitly
+         * because they are created in the application layer
+         * to create a new instance of the domain object
+         *
+         * i.e. new Article({ ... })
+         */
+        "src/modules/**/domain/**/!(Article).js",
         "src/modules/**/infrastructure/**/*.js",
         "src/modules/**/interface/**/*.js",
     ],
@@ -22,5 +37,12 @@ container.loadModules(
         formatName: "camelCase",
     },
 );
+
+// Explicit registrations of domain objects
+container.register({
+    Article: asFunction(() =>
+        require("./modules/Articles/domain/Article"),
+    ).singleton(),
+});
 
 module.exports = container;
