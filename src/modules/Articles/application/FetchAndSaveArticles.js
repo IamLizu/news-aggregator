@@ -1,8 +1,15 @@
 class FetchAndSaveArticles {
-    constructor({ rssParserAdapter, Article, articlesRepository, logger }) {
+    constructor({
+        rssParserAdapter,
+        Article,
+        articlesRepository,
+        topicExtractor,
+        logger,
+    }) {
         this.rssParserAdapter = rssParserAdapter;
         this.Article = Article;
         this.articlesRepository = articlesRepository;
+        this.topicExtractor = topicExtractor;
         this.logger = logger;
     }
 
@@ -23,12 +30,19 @@ class FetchAndSaveArticles {
                 });
             });
 
-            await this.articlesRepository.saveArticles(articles);
+            const enrichedArticles = articles.map((article) => {
+                article.topics = this.topicExtractor.extractTopics(
+                    article.content || article.description,
+                );
+                return article;
+            });
+
+            await this.articlesRepository.saveArticles(enrichedArticles);
 
             this.logger.info(
-                `Fetched and saved ${articles.length} articles from ${feedUrl}`,
+                `Fetched and saved ${enrichedArticles.length} articles from ${feedUrl}`,
             );
-            return articles;
+            return enrichedArticles;
         } catch (error) {
             this.logger.error(
                 `Failed to fetch and save articles: ${error.message}`,
