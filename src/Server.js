@@ -1,5 +1,6 @@
 const express = require("express");
 const config = require("config");
+const routes = require("./routes");
 
 class Server {
     constructor({ logger }) {
@@ -9,7 +10,10 @@ class Server {
         this.server = null; // To store the server instance for shutdown handling
 
         this.initializeMiddleware();
-        this.initializeRoutes();
+
+        //TODO: handle versioning
+        this.app.use("/", routes());
+
         this.initializeErrorHandling();
     }
 
@@ -26,21 +30,6 @@ class Server {
                 next();
             });
         }
-    }
-
-    /**
-     * Initialize application routes.
-     */
-    initializeRoutes() {
-        this.app.get("/", (req, res) => {
-            res.json({
-                application: "news-aggregator",
-                author: "S M Mahmudul Hasan <he@smmahmudulhasan.com>",
-                message: "Welcome to the API!",
-            });
-        });
-
-        // more routes or route handling logic here for later
     }
 
     /**
