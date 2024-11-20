@@ -1,14 +1,16 @@
-const express = require("express");
-const logger = require("./src/shared/logger/LoggerService");
-const config = require("config");
+const container = require("./src/DIContainer");
 
-const app = express();
-const PORT = config.get("PORT");
+const server = container.resolve("server");
+const logger = container.resolve("logger");
 
-app.get("/", (req, res) => {
-    res.send("Hello World");
-});
+(async () => {
+    try {
+        server.start();
+    } catch (err) {
+        logger.error("Failed to start the server", {
+            error: err.message,
+        });
 
-app.listen(PORT, () => {
-    logger.info("Server is running on http://localhost:" + PORT);
-});
+        process.exit(1);
+    }
+})();

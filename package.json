@@ -5,6 +5,7 @@
     "main": "index.js",
     "license": "MIT",
     "dependencies": {
+        "awilix": "^12.0.3",
         "config": "^3.3.12",
         "dotenv": "^16.4.5",
         "express": "^4.21.1",
