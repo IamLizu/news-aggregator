@@ -40,7 +40,7 @@ const routes = () => {
                     );
                 }
             } catch (error) {
-                logger.error("Error mounting routes", { key, error });
+                logger.error(error, { key });
             }
         }
     });

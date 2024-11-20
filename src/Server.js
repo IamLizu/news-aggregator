@@ -49,19 +49,25 @@ class Server {
         // Global error handler
         this.app.use((err, req, res, _next) => {
             const status = err.status || 500;
-            const message = err.message || "Internal Server Error";
 
-            this.logger.error(`Error: ${message}`, {
+            // Log the full error details for internal debugging
+            this.logger.error(`Error: ${err.message}`, {
                 status,
                 stack: err.stack,
             });
 
-            res.status(status).json({
+            // Respond with a generic message in production
+            const response = {
                 error: {
-                    message,
+                    message:
+                        process.env.NODE_ENV === "production"
+                            ? "An unexpected error occurred."
+                            : err.message,
                     status,
                 },
-            });
+            };
+
+            res.status(status).json(response);
         });
     }
 
