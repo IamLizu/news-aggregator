@@ -1,0 +1,5 @@
+{
+    "LOG_LEVEL": "info",
+    "DATABASE_URL": "mongodb://localhost:27017/news-aggregator",
+    "PORT": 3000
+}

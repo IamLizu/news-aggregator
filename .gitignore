@@ -1,0 +1,9 @@
+node_modules
+
+# Logs
+logs/
+playground
+
+# Config files
+config/development.json
+config/production.json
