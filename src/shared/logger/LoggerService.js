@@ -27,8 +27,14 @@ class LoggerService {
                     format: winston.format.combine(
                         winston.format.colorize(),
                         winston.format.printf(
-                            ({ timestamp, level, message, ...meta }) => {
-                                return `${timestamp} [${level}]: ${message} ${JSON.stringify(meta)}`;
+                            ({
+                                timestamp,
+                                level,
+                                message,
+                                caller,
+                                ...meta
+                            }) => {
+                                return `${timestamp} [${level}] [${caller}]: ${message} ${JSON.stringify(meta)}`;
                             },
                         ),
                     ),
@@ -55,14 +61,48 @@ class LoggerService {
         });
     }
 
+    #getCallerFile() {
+        const originalPrepareStackTrace = Error.prepareStackTrace;
+        Error.prepareStackTrace = (_, stack) => stack;
+        const stack = new Error().stack;
+        Error.prepareStackTrace = originalPrepareStackTrace;
+
+        // Find the caller of the logger method (skip LoggerService calls)
+        const callerStack = stack.find(
+            (frame) => !frame.getFileName().includes(__filename),
+        );
+
+        if (callerStack) {
+            return `${callerStack.getFileName()}:${callerStack.getLineNumber()}`;
+        }
+        return "unknown";
+    }
+
+    #skeleton(logFn, message, meta) {
+        /**
+         * Getting the caller introduces a performance overhead
+         * because of stack trace generation on each log call.
+         *
+         * This is useful for debugging purposes but should be
+         * called in production environments.
+         */
+        if (process.env.NODE_ENV === "development") {
+            const caller = this.#getCallerFile();
+
+            logFn(message, { ...meta, caller });
+        } else {
+            logFn(message, meta);
+        }
+    }
+
     /**
      * Logs an informational message.
      *
      * @param {string} message - The log message.
      * @param {object} [meta] - Additional metadata.
      */
-    info(message, meta = {}) {
-        this.logger.info(message, meta);
+    info(message, meta) {
+        this.#skeleton(this.logger.info, message, meta);
     }
 
     /**
@@ -71,8 +111,8 @@ class LoggerService {
      * @param {string} message - The log message.
      * @param {object} [meta] - Additional metadata.
      */
-    warn(message, meta = {}) {
-        this.logger.warn(message, meta);
+    warn(message, meta) {
+        this.#skeleton(this.logger.warn, message, meta);
     }
 
     /**
@@ -80,7 +120,11 @@ class LoggerService {
      * @param {string} message - The log message.
      * @param {object} [meta] - Additional metadata.
      */
-    error(message, meta = {}) {
+    error(message, meta) {
+        /**
+         * not using the skeleton method
+         * because we want to log the stack trace from the error
+         */
         this.logger.error(message, meta);
     }
 
@@ -90,8 +134,8 @@ class LoggerService {
      * @param {string} message - The log message.
      * @param {object} [meta] - Additional metadata.
      */
-    debug(message, meta = {}) {
-        this.logger.debug(message, meta);
+    debug(message, meta) {
+        this.#skeleton(this.logger.debug, message, meta);
     }
 }
 
