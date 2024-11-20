@@ -34,7 +34,11 @@ class LoggerService {
                                 caller,
                                 ...meta
                             }) => {
-                                return `${timestamp} [${level}] [${caller}]: ${message} ${JSON.stringify(meta)}`;
+                                if (caller) {
+                                    return `${timestamp} [${level}] [${caller}]: ${message} ${JSON.stringify(meta)}`;
+                                } else {
+                                    return `${timestamp} [${level}]: ${message} ${JSON.stringify(meta)}`;
+                                }
                             },
                         ),
                     ),
@@ -86,7 +90,7 @@ class LoggerService {
          * This is useful for debugging purposes but should not be
          * called in production environments.
          */
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === "debug") {
             const caller = this.#getCallerFile();
 
             logFn(message, { ...meta, caller });
