@@ -1,20 +1,26 @@
-const { createContainer, asValue, asFunction } = require("awilix");
+const { createContainer, asValue, Lifetime, InjectionMode } = require("awilix");
 const LoggerService = require("./shared/logger/LoggerService");
-const Server = require("./Server");
 
 const container = createContainer();
 
 container.register({
     logger: asValue(LoggerService),
-
-    /**
-     * Instead of directly registering the Server class,
-     * we use a factory (asFunction) to create it,
-     * passing resolved dependencies (logger) explicitly.
-     * This delays instantiation until the server is resolved,
-     * preventing cyclic references.
-     */
-    server: asFunction(({ logger }) => new Server({ logger })).singleton(),
 });
+
+container.loadModules(
+    [
+        "src/modules/**/application/**/*.js",
+        "src/modules/**/domain/**/*.js",
+        "src/modules/**/infrastructure/**/*.js",
+        "src/modules/**/interface/**/*.js",
+    ],
+    {
+        resolverOptions: {
+            lifetime: Lifetime.SINGLETON,
+            injectionMode: InjectionMode.PROXY,
+        },
+        formatName: "camelCase",
+    },
+);
 
 module.exports = container;

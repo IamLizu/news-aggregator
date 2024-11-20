@@ -1,6 +1,5 @@
+const server = require("./src/Server");
 const container = require("./src/DIContainer");
-
-const server = container.resolve("server");
 const logger = container.resolve("logger");
 
 (async () => {

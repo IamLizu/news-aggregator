@@ -1,34 +1,47 @@
-const path = require("path");
-const fs = require("fs");
 const { Router } = require("express");
 const pluralize = require("pluralize");
-const logger = require("./shared/logger/LoggerService");
+const container = require("./DIContainer");
 
-const MODULES_PATH = path.join(__dirname, "./modules");
+const logger = container.resolve("logger");
 
 const routes = () => {
     logger.info("Initializing routes...");
 
-    const router = new Router();
+    const router = Router();
 
     router.get("/", (req, res) => {
         res.json({
             application: "news-aggregator",
             author: "S M Mahmudul Hasan <he@smmahmudulhasan.com>",
-            message: "Welcome to the API!",
+            message: "Welcome to the news-aggregator API!",
         });
     });
 
-    fs.readdirSync(MODULES_PATH).forEach((file) => {
-        const routePath = path.join(MODULES_PATH, file, "interface");
-        const routeFile = path.join(routePath, `${file}Routes.js`);
+    logger.debug(JSON.stringify(container.registrations));
 
-        logger.debug("Loading", {
-            route: routeFile,
-        });
+    // Iterate over all container registrations to find `Routes`
+    Object.entries(container.registrations).forEach(([key]) => {
+        if (key.endsWith("Routes")) {
+            logger.debug("Mounting routes for:", { key });
 
-        if (fs.existsSync(routeFile)) {
-            router.use(`/${pluralize(file)}`, require(routeFile)());
+            try {
+                const routeInstance = container.resolve(key);
+
+                // Check for `getRoutes` method and mount
+                if (typeof routeInstance.getRoutes === "function") {
+                    const basePath = `/${pluralize(key.replace("Routes", "").toLowerCase())}`;
+                    router.use(basePath, routeInstance.getRoutes());
+
+                    logger.info(`Mounted routes at ${basePath}`);
+                } else {
+                    logger.error(
+                        "Route instance does not have getRoutes method",
+                        { key },
+                    );
+                }
+            } catch (error) {
+                logger.error("Error mounting routes", { key, error });
+            }
         }
     });
 

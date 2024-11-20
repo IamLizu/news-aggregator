@@ -1,9 +1,12 @@
 const express = require("express");
 const config = require("config");
 const routes = require("./routes");
+const container = require("./DIContainer");
+
+const logger = container.resolve("logger");
 
 class Server {
-    constructor({ logger }) {
+    constructor() {
         this.app = express();
         this.logger = logger;
         this.port = config.get("PORT") || 3000;
@@ -93,4 +96,4 @@ class Server {
     }
 }
 
-module.exports = Server;
+module.exports = new Server();
