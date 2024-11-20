@@ -33,7 +33,11 @@ class Server {
      */
     initializeRoutes() {
         this.app.get("/", (req, res) => {
-            res.json({ message: "Welcome to the API!" });
+            res.json({
+                application: "news-aggregator",
+                author: "S M Mahmudul Hasan <he@smmahmudulhasan.com>",
+                message: "Welcome to the API!",
+            });
         });
 
         // more routes or route handling logic here for later

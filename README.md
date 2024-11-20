@@ -11,7 +11,9 @@
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
     - [Environment Variables](#environment-variables)
-    - [Running the application](#running-the-application)
+- [Lint Code](#lint-code)
+- [Run Application](#run-application)
+- [Logging](#logging)
 
 <!-- ## Features -->
 
@@ -33,7 +35,7 @@ yarn install
 
 Please create  `development.json` / `production.json` file in `config` directory following the `default.json` file as a template. This file will be used to store all the configuration settings for the application.
 
-### Lint Code
+## Lint Code
 
 [ESLint](https://eslint.org/) is used to lint the code. To lint the code, run the following command:
 
@@ -51,7 +53,7 @@ yarn lint:fix
 > Unused variables are only allowed with a `_` prefix. This is to prevent the `no-unused-vars` rule from throwing an error when using the `_` variable in the code.  
 > Useful for cases like the `next` function in Express.js error handling middleware.
 
-### Run Application
+## Run Application
 In development mode, the application uses [nodemon](https://www.npmjs.com/package/nodemon) to automatically restart the server when changes are made to the code.
 
 ```bash
@@ -63,7 +65,7 @@ To run the application in production mode, run the following command:
 ```bash
 yarn start
 ```
-### Logging
+## Logging
 Once you run the application, you may see the logs in the console.
 
 The application uses [winston](https://www.npmjs.com/package/winston) for logging. The logs are stored in the `logs` directory. The logs are rotated daily (20mb max size) and stored in the `logs` directory with the format `application-YYYY-MM-DD.log` and `error-YYYY-MM-DD.log`.
