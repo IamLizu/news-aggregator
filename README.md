@@ -22,6 +22,7 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
 - [Article Data Structure](#article-data-structure)
     - [Storage](#storage)
     - [Fetching Data](#fetching-data-1)
+    - [Schedule](#schedule)
     - [Topic Extraction Method](#topic-extraction-method)
     - [Named Entity Extraction Method](#named-entity-extraction-method)
     - [Filtering](#filtering-1)
@@ -181,6 +182,10 @@ DDD makes it easier to write clean code. Easy to scale and write testable codeba
 
 - Take a json file and use [`rss-parser`](https://www.npmjs.com/package/rss-parser) to parse the feed URL(s).
 - Normalize the data using Article domain and create article object.
+
+### Schedule
+- Used [`node-schedule`](https://www.npmjs.com/package/node-schedule) to periodically parse configured urls.
+- Current interval is 10 minutes.
 
 
 ### Topic Extraction Method
