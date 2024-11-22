@@ -111,8 +111,9 @@ const filterArticles = async (query) => {
                 yargs
                     .option("keyword", {
                         alias: "k",
-                        type: "string",
-                        description: "Keyword to filter articles",
+                        type: "array",
+                        description:
+                            "Keywords to filter articles (supports multiple keywords)",
                     })
                     .option("fromDate", {
                         alias: "f",

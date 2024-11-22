@@ -38,7 +38,7 @@ class ArticlesRepository {
      * @returns {Promise<Array>} - Filtered or all articles.
      */
     async getAllArticles(query = {}) {
-        const { keyword, fromDate, toDate } = query;
+        const { keywords = [], fromDate, toDate } = query;
 
         const mongoQuery = {};
 
@@ -67,8 +67,9 @@ class ArticlesRepository {
             }
         }
 
-        if (keyword) {
-            mongoQuery.$or = [
+        // Handle multiple keywords in topics and entities
+        if (keywords.length > 0) {
+            mongoQuery.$or = keywords.flatMap((keyword) => [
                 { topics: { $regex: keyword, $options: "i" } },
                 { "entities.people": { $regex: keyword, $options: "i" } },
                 { "entities.locations": { $regex: keyword, $options: "i" } },
@@ -78,7 +79,7 @@ class ArticlesRepository {
                         $options: "i",
                     },
                 },
-            ];
+            ]);
         }
 
         return await this.articleModel.find(mongoQuery);
