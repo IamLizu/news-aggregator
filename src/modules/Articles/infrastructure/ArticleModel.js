@@ -48,4 +48,10 @@ const articleSchema = new mongoose.Schema(
     },
 );
 
+articleSchema.index({ publicationDate: 1 });
+articleSchema.index({ topics: 1 });
+articleSchema.index({ "entities.people": 1 });
+articleSchema.index({ "entities.locations": 1 });
+articleSchema.index({ "entities.organizations": 1 });
+
 module.exports = mongoose.model("Article", articleSchema);
