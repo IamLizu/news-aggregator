@@ -78,8 +78,8 @@ const cli = async () => {
             },
         )
         .command(
-            "filter",
-            "Filter articles based on query",
+            "view",
+            "View and filter articles based on query",
             (yargs) => {
                 yargs
                     .option("keyword", {

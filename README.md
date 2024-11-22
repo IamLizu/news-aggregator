@@ -97,7 +97,7 @@ node index.js fetch --json feeds.json
 - Supports multiple keyword filtering.
 
 ```bash
-node index.js filter --keyword "putin" --keyword "trump" --fromDate "2024-11-01" --toDate "2024-11-20"
+node index.js view --keyword "putin" --keyword "trump" --fromDate "2024-11-01" --toDate "2024-11-20"
 ```
 
 
@@ -118,7 +118,7 @@ You can run the application using the following commands:
 
 3. Filter articles:
    ```bash
-   node index.js filter --keyword "putin" --fromDate "2024-11-01" --toDate "2024-11-20"
+   node index.js view --keyword "putin" --fromDate "2024-11-01" --toDate "2024-11-20"
    ```
 
 ### Lint Code
@@ -181,31 +181,31 @@ DDD makes it easier to write clean code. Easy to scale and write testable codeba
 - Normalize the data using Article domain and create article object.
 
 
-## Topic Extraction Method
+### Topic Extraction Method
 
-### Approach
+#### Approach
 - **Service**: OpenAI's GPT model gpt-3.5-turbo-instruct with max token 100 and temperature 0.7.
 
 A combination of news title and content is sent to Chat Completion API.
 
 Using the completion API of OpenAI, the model generates a list of key topics from the article. Then those topics are trimmed and returned to caller for further processing (modifying the article and saving in database).
 
-### Example Prompt
+#### Example Prompt
 ```text
 Extract 5 key topics from the following text. Provide the topics as a comma-separated list of concise keywords. Avoid long phrases or sentences:"President Putin met with global leaders to discuss climate change in Moscow."
 ```
-### Example Output
+#### Example Output
 ```text
 Putin, global leaders, climate change, meeting, Moscow
 ```
 
-## Named Entity Extraction Method
-### Approach
+### Named Entity Extraction Method
+#### Approach
 - **Service**: OpenAI's GPT model gpt-4 with max token 200 and temperature 0.
 
 Same approach as the topic extraction method.
 
-### Example Prompt
+#### Example Prompt
 ```text
 Extract named entities (people, locations, organizations) from the following text.
 Return the result strictly as valid JSON with keys: "people", "locations", "organizations".
@@ -213,7 +213,7 @@ Return the result strictly as valid JSON with keys: "people", "locations", "orga
 Text: "President Putin met with global leaders to discuss climate change in Moscow."
 ```
 
-### Example Output
+#### Example Output
 ```json
 {
   "people": ["President Putin"],
@@ -222,6 +222,11 @@ Text: "President Putin met with global leaders to discuss climate change in Mosc
 }
 ```
 
-## Visualization
+### Filtering
+- Query with passed `--keyword "putin"` value 
+- Supports multiple keyword query
+- Supports from and to-date filtering
 
-- Use `yargs` to expose command `filter` which without any query outputs stringified JSON. The string can be easily feed to different programs or API for further processing / handling if needed.
+### Visualization
+
+- Use `yargs` to expose command `view` which without any query outputs stringified JSON. The string can be easily feed to different programs or API for further processing / handling if needed.
