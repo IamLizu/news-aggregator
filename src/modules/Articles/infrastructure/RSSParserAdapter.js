@@ -4,7 +4,6 @@ class RSSParserAdapter {
         this.logger = logger;
     }
 
-    //TODO: Think about multiple urls and how to handle them
     async parse(url) {
         try {
             this.logger.info(`Fetching RSS feed: ${url}`);
@@ -17,14 +16,12 @@ class RSSParserAdapter {
 
             return feed;
         } catch (error) {
-            this.logger.error(`Failed to fetch or parse RSS feed: ${url}`, {
-                error: error.message,
-            });
-
-            //TODO: Can we throw this error in logger?
-            throw new Error(
-                `Failed to fetch or parse RSS feed: ${error.message}`,
+            this.logger.error(
+                `Failed to fetch or parse RSS feed: ${url}`,
+                error,
             );
+
+            return null;
         }
     }
 }

@@ -18,6 +18,11 @@ class FetchAndSaveArticles {
             // Parse the RSS feed
             const feed = await this.rssParserAdapter.parse(feedUrl);
 
+            if (!feed || !feed.items || feed.items.length === 0) {
+                this.logger.warn(`No articles found in feed: ${feedUrl}`);
+                return [];
+            }
+
             // Transform feed items into Article entities directly
             const articles = feed.items.map((item) => {
                 return new this.Article({
@@ -47,6 +52,7 @@ class FetchAndSaveArticles {
             this.logger.error(
                 `Failed to fetch and save articles: ${error.message}`,
             );
+
             throw error;
         }
     }
