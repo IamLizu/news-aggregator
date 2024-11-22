@@ -131,7 +131,7 @@ const filterArticles = async (query) => {
                     await connect();
 
                     const query = {
-                        keyword: args.keyword,
+                        keywords: args.keyword,
                         fromDate: args.fromDate,
                         toDate: args.toDate,
                     };
