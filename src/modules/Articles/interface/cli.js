@@ -29,7 +29,7 @@ const fetchFeeds = async (feedsPath) => {
 };
 
 const scheduleFeeds = (feedsPath) => {
-    scheduler.scheduleTask("runProgram", "* * * * *", async () => {
+    scheduler.scheduleTask("runProgram", "*/10 * * * *", async () => {
         await fetchFeeds(feedsPath);
     });
 
