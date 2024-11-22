@@ -3,6 +3,7 @@ const path = require("path");
 
 const container = require("./src/DIContainer");
 const logger = container.resolve("logger");
+const scheduler = container.resolve("scheduler");
 
 const { connect, disconnect } = require("./src/shared/infrastructure/Database");
 
@@ -42,12 +43,20 @@ const runProgram = async () => {
         // Connect to the database
         await connect();
 
-        await runProgram();
+        // Schedule the 'runProgram' task to run every minute
+        scheduler.scheduleTask("runProgram", "* * * * *", runProgram);
+
+        logger.info("Scheduler initialized and tasks scheduled");
+
+        // List all scheduled tasks
+        const tasks = scheduler.listTasks();
+
+        logger.info("Currently scheduled tasks:", { tasks });
     } catch (err) {
         logger.error("Failed to start application", {
             error: err.message,
         });
-    } finally {
+
         // Disconnect from the database
         await disconnect();
     }

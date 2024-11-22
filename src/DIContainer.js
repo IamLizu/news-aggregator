@@ -9,6 +9,7 @@ const {
 const LoggerService = require("./shared/logger/LoggerService");
 const RSSParser = require("rss-parser");
 const Validator = require("./shared/utils/Validator");
+const Scheduler = require("./shared/utils/Scheduler");
 
 const container = createContainer();
 
@@ -16,6 +17,7 @@ container.register({
     logger: asValue(LoggerService),
     parser: asValue(new RSSParser()),
     validator: asClass(Validator).singleton(),
+    scheduler: asClass(Scheduler).singleton(),
 });
 
 container.loadModules(
