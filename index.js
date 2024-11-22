@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-const server = require("./src/Server");
 const container = require("./src/DIContainer");
 const logger = container.resolve("logger");
 
@@ -43,21 +42,13 @@ const runProgram = async () => {
         // Connect to the database
         await connect();
 
-        // Check for mode from command-line arguments or environment variable
-        if (
-            process.argv.includes("--run-program") ||
-            process.env.RUN_PROGRAM === "true"
-        ) {
-            await runProgram();
-        } else {
-            server.start();
-        }
-
-        // Disconnect from the database
-        await disconnect();
+        await runProgram();
     } catch (err) {
         logger.error("Failed to start application", {
             error: err.message,
         });
+    } finally {
+        // Disconnect from the database
+        await disconnect();
     }
 })();
