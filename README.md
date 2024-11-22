@@ -18,8 +18,12 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
 - [Lint Code](#lint-code)
 - [Logging](#logging)
 - [Architecture Overview](#architecture-overview)
+- [Storage](#storage)
 - [Approach and Data Structures](#approach-and-data-structures)
+- [Fetching Data](#fetching-data-1)
 - [Topic Extraction Method](#topic-extraction-method)
+- [Named Entity Extraction Method](#named-entity-extraction-method)
+- [Visualization](#visualization)
 
 ## Setup
 
@@ -171,7 +175,7 @@ DDD makes it easier to write clean code. Easy to scale and write testable codeba
 - MongoDB is used to store the articles.
 - Indexed fields include `publicationDate`, `topics`, and `entities` for efficient querying.
 
-## Fetching data
+### Fetching data
 
 - Take a json file and use [`rss-parser`](https://www.npmjs.com/package/rss-parser) to parse the feed URL(s).
 - Normalize the data using Article domain and create article object.
@@ -217,10 +221,6 @@ Text: "President Putin met with global leaders to discuss climate change in Mosc
   "organizations": []
 }
 ```
-
-## Persist
-- Upon topic and named entity extraction using OpenAPI, Save the articles in MongoDB.
-- Create indexes for `publicationDate`, `topics` and `entities` for faster query.
 
 ## Visualization
 
