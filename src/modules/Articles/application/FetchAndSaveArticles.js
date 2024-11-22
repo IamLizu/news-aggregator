@@ -5,16 +5,22 @@ class FetchAndSaveArticles {
         articlesRepository,
         topicExtractor,
         logger,
+        validator,
     }) {
         this.rssParserAdapter = rssParserAdapter;
         this.Article = Article;
         this.articlesRepository = articlesRepository;
         this.topicExtractor = topicExtractor;
         this.logger = logger;
+        this.validator = validator;
     }
 
     async execute(feedUrl) {
         try {
+            if (!this.validator.isValidURL(feedUrl)) {
+                throw new Error(`Invalid URL: ${feedUrl}`);
+            }
+
             // Parse the RSS feed
             const feed = await this.rssParserAdapter.parse(feedUrl);
 

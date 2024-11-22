@@ -1,18 +1,21 @@
 const {
     createContainer,
     asValue,
+    asClass,
     Lifetime,
     InjectionMode,
     asFunction,
 } = require("awilix");
 const LoggerService = require("./shared/logger/LoggerService");
 const RSSParser = require("rss-parser");
+const Validator = require("./shared/utils/Validator");
 
 const container = createContainer();
 
 container.register({
     logger: asValue(LoggerService),
     parser: asValue(new RSSParser()),
+    validator: asClass(Validator).singleton(),
 });
 
 container.loadModules(
