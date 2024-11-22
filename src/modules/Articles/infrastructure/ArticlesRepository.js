@@ -28,64 +28,56 @@ class ArticlesRepository {
     }
 
     /**
-     * Get all articles from the database.
+     * Fetch all articles or filter them based on provided query parameters.
      *
-     * @returns {Array<Object>} - Array of article objects.
+     * @param {Object} [query] - Query parameters for filtering.
+     * @param {string} [query.keyword] - Keyword to match topics or entities.
+     * @param {Date} [query.fromDate] - Articles published after this date.
+     * @param {Date} [query.toDate] - Articles published before this date.
+     * @returns {Promise<Array>} - Filtered or all articles.
      */
-    async getAllArticles() {
-        try {
-            const articles = await this.articleModel
-                .find()
-                .sort({ publicationDate: -1 }); // Sort by most recent
-            this.logger.info(`Fetched ${articles.length} articles`);
-            return articles;
-        } catch (error) {
-            this.logger.error("Failed to fetch articles", {
-                error: error.message,
-            });
-            throw error;
-        }
-    }
+    async getAllArticles(query = {}) {
+        const { keyword, fromDate, toDate } = query;
 
-    /**
-     * Find articles by topic.
-     *
-     * @param {string} topic - The topic to search for.
-     * @returns {Array<Object>} - Array of articles matching the topic.
-     */
-    async findArticlesByTopic(topic) {
-        try {
-            const articles = await this.articleModel.find({ topics: topic });
-            this.logger.info(
-                `Found ${articles.length} articles for topic: ${topic}`,
-            );
-            return articles;
-        } catch (error) {
-            this.logger.error(`Failed to find articles by topic: ${topic}`, {
-                error: error.message,
-            });
-            throw error;
-        }
-    }
+        const mongoQuery = {};
 
-    /**
-     * Delete articles by their IDs.
-     *
-     * @param {Array<string>} ids - Array of article IDs to delete.
-     */
-    async deleteArticlesByIds(ids) {
-        try {
-            const result = await this.articleModel.deleteMany({
-                _id: { $in: ids },
-            });
-            this.logger.info(`Deleted ${result.deletedCount} articles`);
-            return result;
-        } catch (error) {
-            this.logger.error("Failed to delete articles", {
-                error: error.message,
-            });
-            throw error;
+        if (fromDate || toDate) {
+            mongoQuery.publicationDate = {};
+            if (fromDate) {
+                const parsedFromDate = new Date(fromDate);
+
+                if (isNaN(parsedFromDate)) {
+                    throw new Error(`Invalid fromDate: ${fromDate}`);
+                }
+
+                mongoQuery.publicationDate.$gte = parsedFromDate;
+            }
+            if (toDate) {
+                const parsedToDate = new Date(toDate);
+
+                if (isNaN(parsedToDate)) {
+                    throw new Error(`Invalid toDate: ${toDate}`);
+                }
+
+                mongoQuery.publicationDate.$lte = parsedToDate;
+            }
         }
+
+        if (keyword) {
+            mongoQuery.$or = [
+                { topics: { $regex: keyword, $options: "i" } },
+                { "entities.people": { $regex: keyword, $options: "i" } },
+                { "entities.locations": { $regex: keyword, $options: "i" } },
+                {
+                    "entities.organizations": {
+                        $regex: keyword,
+                        $options: "i",
+                    },
+                },
+            ];
+        }
+
+        return await this.articleModel.find(mongoQuery);
     }
 }
 
