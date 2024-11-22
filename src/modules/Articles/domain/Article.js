@@ -6,6 +6,7 @@ class Article {
         description,
         content,
         topics,
+        source,
     }) {
         this.title = title;
         this.link = link;
@@ -13,6 +14,7 @@ class Article {
         this.description = description;
         this.content = content;
         this.topics = topics || [];
+        this.source = source;
     }
 }
 

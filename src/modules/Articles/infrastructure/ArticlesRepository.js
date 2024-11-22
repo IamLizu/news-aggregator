@@ -1,7 +1,8 @@
+const articleModel = require("./ArticleModel");
 class ArticlesRepository {
-    constructor({ articleModel, logger }) {
-        this.articleModel = articleModel;
+    constructor({ logger }) {
         this.logger = logger;
+        this.articleModel = articleModel;
     }
 
     /**

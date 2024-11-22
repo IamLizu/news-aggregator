@@ -31,7 +31,8 @@ class FetchAndSaveArticles {
                     publicationDate: item.pubDate || item.isoDate,
                     description: item.contentSnippet || item.description,
                     content: item.content || null,
-                    topics: [], // Topics will be added later
+                    topics: [],
+                    source: feedUrl,
                 });
             });
 

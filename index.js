@@ -52,13 +52,12 @@ const runProgram = async () => {
         } else {
             server.start();
         }
+
+        // Disconnect from the database
+        await disconnect();
     } catch (err) {
         logger.error("Failed to start application", {
             error: err.message,
         });
-    } finally {
-        // Disconnect from the database
-        await disconnect();
-        process.exit(1);
     }
 })();
