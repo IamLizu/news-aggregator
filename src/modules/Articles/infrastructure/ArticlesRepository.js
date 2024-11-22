@@ -1,3 +1,4 @@
+const moment = require("moment");
 const articleModel = require("./ArticleModel");
 class ArticlesRepository {
     constructor({ logger }) {
@@ -32,8 +33,8 @@ class ArticlesRepository {
      *
      * @param {Object} [query] - Query parameters for filtering.
      * @param {string} [query.keyword] - Keyword to match topics or entities.
-     * @param {Date} [query.fromDate] - Articles published after this date.
-     * @param {Date} [query.toDate] - Articles published before this date.
+     * @param {string} [query.fromDate] - Articles published after this date.
+     * @param {string} [query.toDate] - Articles published before this date.
      * @returns {Promise<Array>} - Filtered or all articles.
      */
     async getAllArticles(query = {}) {
@@ -41,24 +42,27 @@ class ArticlesRepository {
 
         const mongoQuery = {};
 
+        // Handle date range with Moment.js
         if (fromDate || toDate) {
             mongoQuery.publicationDate = {};
-            if (fromDate) {
-                const parsedFromDate = new Date(fromDate);
 
-                if (isNaN(parsedFromDate)) {
+            if (fromDate) {
+                const parsedFromDate = moment(fromDate, "YYYY-MM-DD")
+                    .startOf("day")
+                    .toDate();
+                if (!parsedFromDate || isNaN(parsedFromDate)) {
                     throw new Error(`Invalid fromDate: ${fromDate}`);
                 }
-
                 mongoQuery.publicationDate.$gte = parsedFromDate;
             }
-            if (toDate) {
-                const parsedToDate = new Date(toDate);
 
-                if (isNaN(parsedToDate)) {
+            if (toDate) {
+                const parsedToDate = moment(toDate, "YYYY-MM-DD")
+                    .endOf("day")
+                    .toDate();
+                if (!parsedToDate || isNaN(parsedToDate)) {
                     throw new Error(`Invalid toDate: ${toDate}`);
                 }
-
                 mongoQuery.publicationDate.$lte = parsedToDate;
             }
         }
