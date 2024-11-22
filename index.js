@@ -5,6 +5,8 @@ const server = require("./src/Server");
 const container = require("./src/DIContainer");
 const logger = container.resolve("logger");
 
+const { connect, disconnect } = require("./src/shared/infrastructure/Database");
+
 const runProgram = async () => {
     try {
         const fetchAndSaveArticles = container.resolve("fetchAndSaveArticles");
@@ -33,12 +35,14 @@ const runProgram = async () => {
         logger.error("Failed during program execution", {
             error: err.message,
         });
-        process.exit(1);
     }
 };
 
 (async () => {
     try {
+        // Connect to the database
+        await connect();
+
         // Check for mode from command-line arguments or environment variable
         if (
             process.argv.includes("--run-program") ||
@@ -52,6 +56,9 @@ const runProgram = async () => {
         logger.error("Failed to start application", {
             error: err.message,
         });
+    } finally {
+        // Disconnect from the database
+        await disconnect();
         process.exit(1);
     }
 })();
