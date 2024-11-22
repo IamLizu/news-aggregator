@@ -2,9 +2,6 @@
 
 A Node.js program that fetches, processes, and stores news articles from RSS feeds. The program includes features like filtering articles, topic extraction, and named entity recognition, with support for scheduling periodic RSS feed processing.
 
-> **Note**  
-> Built with [Domain Driven Design (DDD)](https://en.wikipedia.org/wiki/Domain-driven_design) principles.  
-> Dependencies are injected using [awilix](https://www.npmjs.com/package/awilix).
 
 ## Table of Contents
 - [Setup](#setup)
@@ -29,6 +26,7 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
 ### Prerequisites
 - Node.js (v20.10.0 or higher)
 - MongoDB (installed and running locally or via a remote instance)
+- Open API Key (for topic and named entity extraction)
 
 ### Installation
 
@@ -148,6 +146,9 @@ The application follows Domain Driven Design (DDD), organized into the following
 - **Infrastructure**: Interacts with external services (e.g., RSS parser, database).
 - **Interface**: Handles input/output (e.g., CLI commands).
 
+> [!NOTE]  
+DDD makes it easier to write clean code. Easy to scale and write testable codebase.
+
 ## Approach and Data Structures
 
 ### Article Data Structure
@@ -170,45 +171,57 @@ The application follows Domain Driven Design (DDD), organized into the following
 - MongoDB is used to store the articles.
 - Indexed fields include `publicationDate`, `topics`, and `entities` for efficient querying.
 
+## Fetching data
+
+- Take a json file and use [`rss-parser`](https://www.npmjs.com/package/rss-parser) to parse the feed URL(s).
+- Normalize the data using Article domain and create article object.
+
 
 ## Topic Extraction Method
 
 ### Approach
-- **Service**: OpenAI's GPT models.
-- **Method**: Articles are sent to the model with structured prompts for extracting:
-  - Key topics
-  - Named entities (People, Locations, Organizations)
+- **Service**: OpenAI's GPT model gpt-3.5-turbo-instruct with max token 100 and temperature 0.7.
+
+A combination of news title and content is sent to Chat Completion API.
+
+Using the completion API of OpenAI, the model generates a list of key topics from the article. Then those topics are trimmed and returned to caller for further processing (modifying the article and saving in database).
 
 ### Example Prompt
 ```text
-Extract key topics and named entities (people, locations, organizations) from the following text. Return the result strictly as valid JSON:
+Extract 5 key topics from the following text. Provide the topics as a comma-separated list of concise keywords. Avoid long phrases or sentences:"President Putin met with global leaders to discuss climate change in Moscow."
+```
+### Example Output
+```text
+Putin, global leaders, climate change, meeting, Moscow
+```
+
+## Named Entity Extraction Method
+### Approach
+- **Service**: OpenAI's GPT model gpt-4 with max token 200 and temperature 0.
+
+Same approach as the topic extraction method.
+
+### Example Prompt
+```text
+Extract named entities (people, locations, organizations) from the following text.
+Return the result strictly as valid JSON with keys: "people", "locations", "organizations".
 
 Text: "President Putin met with global leaders to discuss climate change in Moscow."
 ```
 
 ### Example Output
-```console
-$ node index.js filter --keyword "putin"
-2024-11-22T15:25:47.145Z [info]: Connected to MongoDB {}
-2024-11-22T15:25:47.148Z [info]: Fetching and filtering articles with query {"query":{"keywords":["putin"]}}
-2024-11-22T15:25:47.177Z [info]: Filtered articles fetched successfully. {"count":6}
-2024-11-22T15:25:47.178Z [info]: Filtered Articles: {"0":{"entities":{"people":[],"locations":[],"organizations":[]},"_id":"67409d4423be104d7ec10c54","title":"As Ukraine Fires U.S. Missiles, Putin Sends a Chilling Message","link":"https://www.nytimes.com/2024/11/22/wor
-ld/europe/ukraine-russia-us-trump-putin.html","publicationDate":"2024-11-25T14:58:57.000Z","description":"The Russian leader ominously declares that America risks nuclear war as it expands its aid.","content":"The Russian leader ominously declares that America risks nu
-clear war as it expands its aid.","topics":["Ukraine","U.S. Missiles","Putin","Chilling Message","Nuclear War"],"source":"https://rss.nytimes.com/services/xml/rss/nyt/World.xml","createdAt":"2024-11-22T15:03:32.647Z","__v":0,"updatedAt":"2024-11-22T15:03:32.664Z"},"1":
-{"entities":{"people":["Merkel","Trump","Putin","Angela Merkel"],"locations":["Germany","Europe"],"organizations":[]},"_id":"67409d4423be104d7ec10c57","title":"Merkel Memoir Recalls What It Was Like Dealing With Trump and Putin","link":"https://www.nytimes.com/2024/11/
-22/world/europe/merkel-memoir-trump-putin.html","publicationDate":"2024-11-22T12:28:54.000Z","description":"The new book by former Chancellor Angela Merkel of Germany also aims to justify decisions she made that are still affecting her country and the rest of Europe.",
-"content":"The new book by former Chancellor Angela Merkel of Germany also aims to justify decisions she made that are still affecting her country and the rest of Europe.","topics":["Merkel","Memoir","Dealing","Trump","Putin"],"source":"https://rss.nytimes.com/services
-/xml/rss/nyt/World.xml","createdAt":"2024-11-22T15:03:32.649Z","__v":0,"updatedAt":"2024-11-22T15:03:32.664Z"},"2":{"entities":{"people":["Omar Hassan al-Bashir","Vladimir V. Putin"],"locations":["Sudan","Russia"],"organizations":["ICC"]},"_id":"67409d4423be104d7ec10c7
-0","title":"Who Has the ICC Charged With War Crimes?","link":"https://www.nytimes.com/2024/11/21/world/middleeast/icc-war-crime-arrest-warrants-putin.html","publicationDate":"2024-11-21T14:25:48.000Z","description":"The short list includes Omar Hassan al-Bashir, the de
-posed president of Sudan, and President Vladimir V. Putin of Russia.","content":"The short list includes Omar Hassan al-Bashir, the deposed president of Sudan, and President Vladimir V. Putin of Russia.","topics":["ICC","charged","war crimes","Omar Hassan al-Bashir","V
-ladimir V. Putin"],"source":"https://rss.nytimes.com/services/xml/rss/nyt/World.xml","createdAt":"2024-11-22T15:03:32.654Z","__v":0,"updatedAt":"2024-11-22T15:03:32.665Z"},"3":{"entities":{"people":[],"locations":[],"organizations":[]},"_id":"67409d4423be104d7ec10c72",
-"title":"Putin Escalates Threats to the West With New Ballistic Missile Launch","link":"https://www.nytimes.com/2024/11/21/world/europe/russia-ballistic-missile-ukraine-war.html","publicationDate":"2024-11-22T03:22:47.000Z","description":"The intermediate-range missile
- did not carry nuclear weapons, but it is part of a strategic arsenal that is capable of delivering them.","content":"The intermediate-range missile did not carry nuclear weapons, but it is part of a strategic arsenal that is capable of delivering them.","topics":["Put
-in","Threats","West","Ballistic Missile","Nuclear Weapons"],"source":"https://rss.nytimes.com/services/xml/rss/nyt/World.xml","createdAt":"2024-11-22T15:03:32.654Z","__v":0,"updatedAt":"2024-11-22T15:03:32.665Z"},"4":{"entities":{"people":[],"locations":[],"organizatio
-ns":[]},"_id":"67409d4c23be104d7ec10c8f","title":"Steve Rosenberg: After days of escalation, what will Putin do next?","link":"https://www.bbc.com/news/articles/c62j1g8g45vo","publicationDate":"2024-11-22T08:04:39.000Z","description":"BBC Russia editor Steve Rosenberg
-assesses the Russian leader's next move.","content":"BBC Russia editor Steve Rosenberg assesses the Russian leader's next move.","topics":["Steve Rosenberg","days","escalation","Putin","next move"],"source":"http://feeds.bbci.co.uk/news/world/rss.xml","createdAt":"2024
--11-22T15:03:40.237Z","__v":0,"updatedAt":"2024-11-22T15:03:40.251Z"},"5":{"entities":{"people":[],"locations":[],"organizations":[]},"_id":"67409d4c23be104d7ec10ca3","title":"Putin gifts lion and brown bears to North Korea zoo","link":"https://www.bbc.com/news/article
-s/cx24175015jo","publicationDate":"2024-11-21T04:46:28.000Z","description":"The two countries have grown very close recently, with N Korea supporting Putin's war in Ukraine.","content":"The two countries have grown very close recently, with N Korea supporting Putin's w
-ar in Ukraine.","topics":["Putin","gifts","lion","brown bears","North Korea zoo"],"source":"http://feeds.bbci.co.uk/news/world/rss.xml","createdAt":"2024-11-22T15:03:40.243Z","__v":0,"updatedAt":"2024-11-22T15:03:40.252Z"}}
-2024-11-22T15:25:47.183Z [info]: Disconnected from MongoDB {}
+```json
+{
+  "people": ["President Putin"],
+  "locations": ["Moscow"],
+  "organizations": []
+}
 ```
+
+## Persist
+- Upon topic and named entity extraction using OpenAPI, Save the articles in MongoDB.
+- Create indexes for `publicationDate`, `topics` and `entities` for faster query.
+
+## Visualization
+
+- Use `yargs` to expose command `filter` which without any query outputs stringified JSON. The string can be easily feed to different programs or API for further processing / handling if needed.
