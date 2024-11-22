@@ -50,14 +50,26 @@ const runProgram = async () => {
 
         // List all scheduled tasks
         const tasks = scheduler.listTasks();
-
         logger.info("Currently scheduled tasks:", { tasks });
+
+        // Handle graceful shutdown
+        process.on("SIGINT", async () => {
+            logger.info("Received SIGINT. Shutting down...");
+            await disconnect();
+            process.exit(0);
+        });
+
+        process.on("SIGTERM", async () => {
+            logger.info("Received SIGTERM. Shutting down...");
+            await disconnect();
+            process.exit(0);
+        });
     } catch (err) {
         logger.error("Failed to start application", {
             error: err.message,
         });
 
-        // Disconnect from the database
         await disconnect();
+        process.exit(1);
     }
 })();
