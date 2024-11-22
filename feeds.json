@@ -1,0 +1,10 @@
+{
+    "feeds": [
+        "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+        "http://feeds.bbci.co.uk/news/world/rss.xml",
+        "https://www.nasa.gov/rss/dyn/breaking_news.rss",
+        "https://rss.nytimsses.com/services/xml/rss/nyt/World.xml",
+        "httoooops://rss.nytimsses.com/services/xml/rss/nyt/World.xml" 
+
+    ]
+}

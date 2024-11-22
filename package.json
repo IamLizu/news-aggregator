@@ -29,7 +29,8 @@
         "lint:fix": "eslint . --fix",
         "start": "cross-env NODE_ENV=production node index.js",
         "dev": "cross-env NODE_ENV=development nodemon index.js",
-        "debug": "cross-env NODE_ENV=debug nodemon index.js"
+        "debug": "cross-env NODE_ENV=debug nodemon index.js",
+        "start:program": "cross-env NODE_ENV=production RUN_PROGRAM=true node index.js"
     },
     "engines": {
         "node": ">=20.10.0"
