@@ -10,7 +10,6 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
 - [Setup](#setup)
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
-    - [Environment Variables](#environment-variables)
 - [Features](#features)
     - [Fetching Data](#fetching-data)
         - [Scheduling](#scheduling)
@@ -24,8 +23,6 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
 - [Architecture Overview](#architecture-overview)
 - [Approach and Data Structures](#approach-and-data-structures)
 - [Topic Extraction Method](#topic-extraction-method)
-
----
 
 ## Setup
 
@@ -49,8 +46,6 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
 3. Create configuration files:
    - Copy `default.json` in the `config` directory to `development.json` or `production.json`.
    - Update the `DATABASE_URL` and `OPENAI_KEY` fields in the config files as per your setup.
-
----
 
 ## Features
 
@@ -104,9 +99,6 @@ node index.js filter --keyword "putin" --keyword "trump" --fromDate "2024-11-01"
 ```
 
 
-
----
-
 ## Run Application
 
 ### Usage
@@ -147,7 +139,6 @@ yarn lint:fix
   - `error-YYYY-MM-DD.log`: Error logs.
 - Format: JSON for structured logging.
 
----
 
 ## Architecture Overview
 
@@ -156,8 +147,6 @@ The application follows Domain Driven Design (DDD), organized into the following
 - **Application**: Orchestrates use cases (e.g., `FetchAndSaveArticles`, `GetArticles`).
 - **Infrastructure**: Interacts with external services (e.g., RSS parser, database).
 - **Interface**: Handles input/output (e.g., CLI commands).
-
----
 
 ## Approach and Data Structures
 
@@ -181,7 +170,6 @@ The application follows Domain Driven Design (DDD), organized into the following
 - MongoDB is used to store the articles.
 - Indexed fields include `publicationDate`, `topics`, and `entities` for efficient querying.
 
----
 
 ## Topic Extraction Method
 
