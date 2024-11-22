@@ -18,12 +18,14 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
 - [Lint Code](#lint-code)
 - [Logging](#logging)
 - [Architecture Overview](#architecture-overview)
-- [Storage](#storage)
 - [Approach and Data Structures](#approach-and-data-structures)
-- [Fetching Data](#fetching-data-1)
-- [Topic Extraction Method](#topic-extraction-method)
-- [Named Entity Extraction Method](#named-entity-extraction-method)
-- [Visualization](#visualization)
+- [Article Data Structure](#article-data-structure)
+    - [Storage](#storage)
+    - [Fetching Data](#fetching-data-1)
+    - [Topic Extraction Method](#topic-extraction-method)
+    - [Named Entity Extraction Method](#named-entity-extraction-method)
+    - [Filtering](#filtering-1)
+    - [Visualization](#visualization)
 
 ## Setup
 
