@@ -32,7 +32,6 @@ container.loadModules(
          */
         "src/modules/**/domain/**/!(Article).js",
         "src/modules/**/infrastructure/**/*.js",
-        "src/modules/**/interface/**/*.js",
     ],
     {
         resolverOptions: {
