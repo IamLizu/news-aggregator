@@ -42,12 +42,15 @@ class FetchAndSaveArticles {
                 });
             });
 
-            const enrichedArticles = articles.map((article) => {
-                article.topics = this.topicExtractor.extractTopics(
-                    article.content || article.description,
-                );
-                return article;
-            });
+            // Extract topics and enrich articles
+            const enrichedArticles = await Promise.all(
+                articles.map(async (article) => {
+                    article.topics = await this.topicExtractor.extractTopics(
+                        article.content || article.description,
+                    );
+                    return article;
+                }),
+            );
 
             await this.articlesRepository.saveArticles(enrichedArticles);
 
