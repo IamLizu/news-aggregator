@@ -27,6 +27,7 @@ A Node.js program that fetches, processes, and stores news articles from RSS fee
     - [Named Entity Extraction Method](#named-entity-extraction-method)
     - [Filtering](#filtering-1)
     - [Visualization](#visualization)
+- [Future work scope](#future-work-scope)
 
 ## Setup
 
@@ -237,3 +238,9 @@ Text: "President Putin met with global leaders to discuss climate change in Mosc
 ### Visualization
 
 - Use `yargs` to expose command `view` which without any query outputs stringified JSON. The string can be easily feed to different programs or API for further processing / handling if needed.
+
+## Future work scope
+- Write unit tests
+- Write mutation tests to ensure the written tests do strict checks when there's change in codebase.
+- Allow ability to choose between database or json file as storage
+- Allow ability to choose from various cloud machine learning APIs like ChatGPT, Aure Text processing etc.
