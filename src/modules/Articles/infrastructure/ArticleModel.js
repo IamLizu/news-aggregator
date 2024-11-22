@@ -29,6 +29,11 @@ const articleSchema = new mongoose.Schema(
             type: [String],
             default: [],
         },
+        entities: {
+            people: [String],
+            locations: [String],
+            organizations: [String],
+        },
         source: {
             type: String,
             trim: true,

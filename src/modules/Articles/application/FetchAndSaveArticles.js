@@ -4,6 +4,7 @@ class FetchAndSaveArticles {
         Article,
         articlesRepository,
         topicExtractor,
+        namedEntityExtractor,
         logger,
         validator,
     }) {
@@ -11,6 +12,7 @@ class FetchAndSaveArticles {
         this.Article = Article;
         this.articlesRepository = articlesRepository;
         this.topicExtractor = topicExtractor;
+        this.namedEntityExtractor = namedEntityExtractor;
         this.logger = logger;
         this.validator = validator;
     }
@@ -38,20 +40,27 @@ class FetchAndSaveArticles {
                     description: item.contentSnippet || item.description,
                     content: item.content || null,
                     topics: [],
+                    entities: { people: [], locations: [], organizations: [] },
                     source: feedUrl,
                 });
             });
 
-            // Extract topics and enrich articles
+            // Extract topics and named entities to enrich articles
             const enrichedArticles = await Promise.all(
                 articles.map(async (article) => {
-                    article.topics = await this.topicExtractor.extractTopics(
-                        article.content || article.description,
-                    );
+                    const _text =
+                        article.title + ". " + article.content ||
+                        article.description;
+
+                    article.topics =
+                        await this.topicExtractor.extractTopics(_text);
+
+                    article.entities =
+                        await this.namedEntityExtractor.extractEntities(_text);
+
                     return article;
                 }),
             );
-
             await this.articlesRepository.saveArticles(enrichedArticles);
 
             this.logger.info(
